@@ -1,0 +1,17 @@
+# Build artifacts
+build/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+
+# VS Code
+.vscode/
+
+# Caches and temp
+.cache/
+
+# User-specific and binary files
+*.user
+*.o
+*.obj
+*.log

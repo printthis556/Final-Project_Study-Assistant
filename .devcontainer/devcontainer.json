@@ -1,0 +1,11 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu",
+  "postCreateCommand": "./.devcontainer/setup.sh",
+  "extensions": [
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools"
+  ],
+  "settings": {
+    "cmake.generator": "Ninja"
+  }
+}
