@@ -9,31 +9,52 @@ ApplicationWindow {
     height: 600
     title: "Study Assistant"
 
+    // palette
+    property color colorLight: "#EDE8ED"
+    property color colorMedium: "#C5AAB9"
+    property color colorDark: "#3A2C3B"
+    property color colorDarkest: "#302531"
+    property int radius: 12
+
+    // background layer
+    Rectangle {
+        anchors.fill: parent
+        color: colorDarkest
+    }
+
     StackView {
         id: stackView
         anchors.fill: parent
         initialItem: MyBoardsPage {
             onOpenBoardRequested: function(boardId) {
-                stackView.push("BoardPage.qml", { boardId: boardId })
+                stackView.push("BoardPage.qml", {
+                    "boardId": boardId,
+                    "stackViewRef": stackView   // <-- pass the stackView down
+                })
             }
         }
     }
 
-    // Simple error dialog instead of Snackbar
+
     Dialog {
         id: errorDialog
         modal: true
-        title: "Error"
         standardButtons: Dialog.Ok
-        x: (parent ? (parent.width - width) / 2 : 200)
-        y: (parent ? (parent.height - height) / 2 : 200)
+        title: "Error"
+        property alias message: messageLabel.text
 
-        property string message: ""
+        background: Rectangle {
+            radius: radius
+            color: colorDark
+            border.color: colorMedium
+            border.width: 1
+        }
 
-        contentItem: Text {
-            text: errorDialog.message
-            wrapMode: Text.WordWrap
+        contentItem: Label {
+            id: messageLabel
             padding: 16
+            wrapMode: Text.WordWrap
+            color: colorLight
         }
     }
 
@@ -45,4 +66,3 @@ ApplicationWindow {
         }
     }
 }
-
