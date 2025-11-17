@@ -54,3 +54,6 @@ target_link_libraries(study_assistant_gui
         core
         Qt6::Widgets
 )
+
+add_subdirectory(qmlgui)
+
