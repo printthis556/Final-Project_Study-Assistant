@@ -9,18 +9,47 @@ Page {
     property string boardId: ""
     title: "Ask AI"
 
+    // palette
+    property color colorLight: "#EDE8ED"
+    property color colorMedium: "#C5AAB9"
+    property color colorDark: "#3A2C3B"
+    property color colorDarkest: "#302531"
+    property int radius: 12
+
+    background: Rectangle {
+        color: colorDarkest
+    }
+
     header: ToolBar {
+        background: Rectangle { color: colorDark }
+
         RowLayout {
             anchors.fill: parent
+
             ToolButton {
                 text: "\u25C0 Back"
-                onClicked: StackView.view.pop()
+                onClicked: {
+                    if (StackView.view) {
+                        StackView.view.pop()
+                    }
+                }
+
+                contentItem: Label {
+                    text: parent.text
+                    color: colorLight
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
+
             Label {
-                text: "Ask AI about \"" + boardManager.currentBoardName + "\""
+                text: "Ask AI"
                 font.pixelSize: 20
+                font.bold: true
+                color: colorLight
                 Layout.alignment: Qt.AlignVCenter
             }
+
             Item { Layout.fillWidth: true }
         }
     }
@@ -34,6 +63,18 @@ Page {
             title: "Your question"
             Layout.fillWidth: true
 
+            label: Label {
+                text: control.title
+                color: colorMedium
+                font.bold: true
+            }
+
+            background: Rectangle {
+                radius: radius
+                color: colorDark
+                border.color: "#241A26"
+            }
+
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 8
@@ -45,23 +86,44 @@ Page {
                     Layout.preferredHeight: 120
                     placeholderText: "Ask a question based on the notes in this board..."
                     wrapMode: TextArea.Wrap
+                    color: colorLight
+                    placeholderTextColor: colorMedium
+
+                    background: Rectangle {
+                        radius: radius
+                        color: colorDarkest
+                        border.color: colorMedium
+                    }
                 }
 
                 RowLayout {
                     Layout.fillWidth: true
                     Item { Layout.fillWidth: true }
 
-                    Button {
-                        text: "Ask AI"
-                        enabled: !studyController.isBusy
-                        onClicked: {
-                            studyController.askAiAboutBoard(boardId, questionInput.text)
-                        }
-                    }
-
                     BusyIndicator {
                         running: studyController.isBusy
                         visible: running
+                    }
+
+                    Button {
+                        text: "Ask AI"
+                        enabled: !studyController.isBusy
+
+                        contentItem: Label {
+                            text: parent.text
+                            color: colorDarkest
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        background: Rectangle {
+                            radius: radius
+                            color: colorMedium
+                        }
+
+                        onClicked: {
+                            studyController.askAiAboutBoard(boardId, questionInput.text)
+                        }
                     }
                 }
             }
@@ -72,15 +134,31 @@ Page {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            label: Label {
+                text: control.title
+                color: colorMedium
+                font.bold: true
+            }
+
+            background: Rectangle {
+                radius: radius
+                color: colorDark
+                border.color: "#241A26"
+            }
+
             ScrollView {
                 anchors.fill: parent
+                clip: true
+
                 Text {
                     id: answerText
                     anchors.margins: 8
+                    width: parent.width - 16
                     text: studyController.lastAiAnswer.length > 0
                           ? studyController.lastAiAnswer
                           : "No answer yet. Ask a question above."
                     wrapMode: Text.WordWrap
+                    color: colorLight
                 }
             }
         }
