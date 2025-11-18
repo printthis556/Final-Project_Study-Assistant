@@ -29,14 +29,19 @@ Page {
     }
 
     background: Rectangle {
-        color: colorDarkest
+        gradient: Gradient {
+            GradientStop { position: 0; color: colorDarkest }
+            GradientStop { position: 1; color: colorDark }
+        }
     }
 
     header: ToolBar {
-        background: Rectangle { color: colorDark }
+        background: Rectangle { color: colorDark; opacity: 0.95 }
 
         RowLayout {
             anchors.fill: parent
+            anchors.margins: 6
+            spacing: 8
 
             ToolButton {
                 text: "\u25C0 Back"
@@ -47,12 +52,13 @@ Page {
                     color: colorLight
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+                    font.bold: true
                 }
             }
 
             Label {
                 text: "Study Flashcards"
-                font.pixelSize: 20
+                font.pixelSize: 22
                 font.bold: true
                 color: colorLight
                 Layout.alignment: Qt.AlignVCenter
@@ -68,40 +74,68 @@ Page {
         spacing: 12
 
         // Top row: board name + regenerate
-        RowLayout {
+        Frame {
             Layout.fillWidth: true
+            padding: 12
 
-            Label {
-                text: "Board: " + boardManager.currentBoardName
-                color: colorLight
+            background: Rectangle {
+                radius: radius
+                color: colorDark
+                border.color: colorMedium
+                opacity: 0.95
             }
 
-            Item { Layout.fillWidth: true }
+            RowLayout {
+                anchors.fill: parent
+                spacing: 10
 
-            BusyIndicator {
-                running: studyController.isBusy
-                visible: running
-            }
+                ColumnLayout {
+                    spacing: 2
 
-            Button {
-                text: "Regenerate"
-                enabled: !studyController.isBusy
+                    Label {
+                        text: "Board"
+                        color: colorMedium
+                        font.pixelSize: 11
+                    }
 
-                contentItem: Label {
-                    text: parent.text
-                    color: colorDarkest
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    Label {
+                        text: boardManager.currentBoardName
+                        color: colorLight
+                        font.pixelSize: 16
+                        font.bold: true
+                    }
                 }
 
-                background: Rectangle {
-                    radius: radius
-                    color: colorMedium
+                Item { Layout.fillWidth: true }
+
+                BusyIndicator {
+                    running: studyController.isBusy
+                    visible: running
                 }
 
-                onClicked: {
-                    studyController.generateFlashcardsForBoard(boardId)
-                    currentIndex = 0
+                Button {
+                    text: "Regenerate"
+                    enabled: !studyController.isBusy
+
+                    contentItem: Label {
+                        text: parent.text
+                        color: colorDarkest
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                    }
+
+                    background: Rectangle {
+                        radius: radius
+                        color: colorMedium
+                        border.color: colorLight
+                        border.width: 1
+                    }
+
+                    onClicked: {
+                        studyController.generateFlashcardsForBoard(boardId)
+                        currentIndex = 0
+                    }
                 }
             }
         }
@@ -118,64 +152,84 @@ Page {
         }
 
         // Navigation row
-        RowLayout {
+        Frame {
             Layout.fillWidth: true
+            padding: 10
 
-            Button {
-                text: "Previous"
-                enabled: currentIndex > 0
-
-                contentItem: Label {
-                    text: parent.text
-                    color: colorDarkest
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                background: Rectangle {
-                    radius: radius
-                    color: colorMedium
-                }
-
-                onClicked: {
-                    if (currentIndex > 0)
-                        currentIndex--
-                    cardLoader.sourceComponent = studyController.flashcardModel.rowCount > 0
-                                                ? cardComponent : emptyComponent
-                }
+            background: Rectangle {
+                radius: radius
+                color: colorDark
+                border.color: colorMedium
+                opacity: 0.95
             }
 
-            Button {
-                text: "Next"
-                enabled: currentIndex < studyController.flashcardModel.rowCount - 1
+            RowLayout {
+                anchors.fill: parent
+                spacing: 10
 
-                contentItem: Label {
-                    text: parent.text
-                    color: colorDarkest
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                Button {
+                    text: "Previous"
+                    enabled: currentIndex > 0
+
+                    contentItem: Label {
+                        text: parent.text
+                        color: colorDarkest
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                    }
+
+                    background: Rectangle {
+                        radius: radius
+                        color: colorMedium
+                        border.color: colorLight
+                        border.width: 1
+                    }
+
+                    onClicked: {
+                        if (currentIndex > 0)
+                            currentIndex--
+                        cardLoader.sourceComponent = studyController.flashcardModel.rowCount > 0
+                                                    ? cardComponent : emptyComponent
+                    }
                 }
 
-                background: Rectangle {
-                    radius: radius
-                    color: colorMedium
+                Button {
+                    text: "Next"
+                    enabled: currentIndex < studyController.flashcardModel.rowCount - 1
+
+                    contentItem: Label {
+                        text: parent.text
+                        color: colorDarkest
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                    }
+
+                    background: Rectangle {
+                        radius: radius
+                        color: colorMedium
+                        border.color: colorLight
+                        border.width: 1
+                    }
+
+                    onClicked: {
+                        if (currentIndex < studyController.flashcardModel.rowCount - 1)
+                            currentIndex++
+                        cardLoader.sourceComponent = studyController.flashcardModel.rowCount > 0
+                                                    ? cardComponent : emptyComponent
+                    }
                 }
 
-                onClicked: {
-                    if (currentIndex < studyController.flashcardModel.rowCount - 1)
-                        currentIndex++
-                    cardLoader.sourceComponent = studyController.flashcardModel.rowCount > 0
-                                                ? cardComponent : emptyComponent
+                Item { Layout.fillWidth: true }
+
+                Label {
+                    text: studyController.flashcardModel.rowCount > 0
+                          ? (currentIndex + 1) + " / " + studyController.flashcardModel.rowCount
+                          : "No flashcards"
+                    color: colorLight
+                    font.bold: true
                 }
-            }
-
-            Item { Layout.fillWidth: true }
-
-            Label {
-                text: studyController.flashcardModel.rowCount > 0
-                      ? (currentIndex + 1) + " / " + studyController.flashcardModel.rowCount
-                      : "No flashcards"
-                color: colorLight
             }
         }
     }
@@ -185,24 +239,25 @@ Page {
         id: cardComponent
 
         Frame {
-            padding: 16
+            padding: 20
 
             background: Rectangle {
                 radius: radius
                 color: colorDark
                 border.color: colorMedium
+                opacity: 0.95
             }
 
             Column {
                 anchors.fill: parent
-                anchors.margins: 4
-                spacing: 12
+                anchors.margins: 6
+                spacing: 14
 
                 Text {
                     text: studyController.flashcardModel.data(
                               studyController.flashcardModel.index(root.currentIndex, 0),
                               FlashcardModel.QuestionRole)
-                    font.pixelSize: 20
+                    font.pixelSize: 22
                     font.bold: true
                     wrapMode: Text.WordWrap
                     color: colorLight
@@ -211,7 +266,8 @@ Page {
                 Rectangle {
                     width: parent.width
                     height: 1
-                    color: "#4D3A4C"
+                    color: colorMedium
+                    opacity: 0.25
                 }
 
                 Text {
@@ -220,6 +276,7 @@ Page {
                               FlashcardModel.AnswerRole)
                     wrapMode: Text.WordWrap
                     color: colorLight
+                    font.pixelSize: 15
                 }
             }
         }
