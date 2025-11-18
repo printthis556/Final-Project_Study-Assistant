@@ -4,6 +4,7 @@
 
 #include "BoardManager.h"
 #include "StudyController.h"
+#include "AiClient.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +20,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     BoardManager boardManager;
-    StudyController studyController(&boardManager);
+    AiClient aiClient;
+    StudyController studyController(&boardManager, &aiClient);
 
     engine.rootContext()->setContextProperty("boardManager", &boardManager);
     engine.rootContext()->setContextProperty("studyController", &studyController);

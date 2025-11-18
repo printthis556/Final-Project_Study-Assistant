@@ -1,10 +1,16 @@
 #include "StudyController.h"
 #include <QDebug>
 
-StudyController::StudyController(BoardManager *manager, QObject *parent)
+StudyController::StudyController(BoardManager *manager, AiClient *aiClient, QObject *parent)
     : QObject(parent),
-      m_boardManager(manager)
+      m_boardManager(manager),
+      m_aiClient(aiClient)
 {
+    if (m_aiClient) {
+        connect(m_aiClient, &AiClient::flashcardsReady, this, &StudyController::handleFlashcardsReady);
+        connect(m_aiClient, &AiClient::answerReady, this, &StudyController::handleAnswerReady);
+        connect(m_aiClient, &AiClient::errorOccurred, this, &StudyController::handleAiError);
+    }
 }
 
 void StudyController::setBusy(bool busy)
@@ -26,11 +32,12 @@ void StudyController::generateFlashcardsForBoard(const QString &boardId)
 
     setBusy(true);
 
-    QVector<Flashcard> cards = m_generator.generateFromText(notes);
-    m_flashcardModel.setFlashcards(cards);
-
-    emit flashcardsChanged();
-    setBusy(false);
+    if (m_aiClient) {
+        m_aiClient->requestFlashcards(notes);
+    } else {
+        QVector<Flashcard> cards = m_generator.generateFromText(notes);
+        handleFlashcardsReady(cards);
+    }
 }
 
 void StudyController::askAiAboutBoard(const QString &boardId, const QString &question)
@@ -40,16 +47,44 @@ void StudyController::askAiAboutBoard(const QString &boardId, const QString &que
         return;
     }
 
-    setBusy(true);
+    if (!m_boardManager) {
+        emit errorOccurred("Board manager unavailable.");
+        return;
+    }
 
     QString context = m_boardManager->allNotesForBoard(boardId);
+    if (context.trimmed().isEmpty()) {
+        emit errorOccurred("This board has no notes.");
+        return;
+    }
 
-    // Fake AI for now — replace with AiClient when ready
-    m_lastAiAnswer =
-        QString("AI Response (placeholder):\n\nQ: %1\n\nNotes size: %2 characters")
-        .arg(question)
-        .arg(context.size());
+    setBusy(true);
 
+    if (m_aiClient) {
+        m_aiClient->requestAnswer(context, question);
+    } else {
+        m_lastAiAnswer = QStringLiteral("AI client not configured.");
+        emit lastAiAnswerChanged();
+        setBusy(false);
+    }
+}
+
+void StudyController::handleFlashcardsReady(const QVector<Flashcard> &cards)
+{
+    m_flashcardModel.setFlashcards(cards);
+    emit flashcardsChanged();
+    setBusy(false);
+}
+
+void StudyController::handleAnswerReady(const QString &answer)
+{
+    m_lastAiAnswer = answer;
     emit lastAiAnswerChanged();
+    setBusy(false);
+}
+
+void StudyController::handleAiError(const QString &message)
+{
+    emit errorOccurred(message);
     setBusy(false);
 }

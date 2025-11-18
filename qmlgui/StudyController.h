@@ -5,6 +5,7 @@
 #include "BoardManager.h"
 #include "FlashcardModel.h"
 #include "FlashcardGenerator.h"
+#include "AiClient.h"
 
 class StudyController : public QObject
 {
@@ -15,7 +16,7 @@ class StudyController : public QObject
     Q_PROPERTY(bool isBusy READ isBusy NOTIFY isBusyChanged)
 
 public:
-    explicit StudyController(BoardManager *manager, QObject *parent = nullptr);
+    explicit StudyController(BoardManager *manager, AiClient *aiClient, QObject *parent = nullptr);
 
     FlashcardModel* flashcardModel() { return &m_flashcardModel; }
     QString lastAiAnswer() const { return m_lastAiAnswer; }
@@ -32,8 +33,12 @@ signals:
 
 private:
     void setBusy(bool busy);
+    void handleFlashcardsReady(const QVector<Flashcard> &cards);
+    void handleAnswerReady(const QString &answer);
+    void handleAiError(const QString &message);
 
     BoardManager *m_boardManager;
+    AiClient *m_aiClient;
     FlashcardModel m_flashcardModel;
     FlashcardGenerator m_generator;
 
