@@ -145,7 +145,7 @@ Page {
             Layout.fillWidth: true
 
             label: Label {
-                text: control.title
+                text: addNote.title
                 color: colorMedium
                 font.pixelSize: 14
                 font.bold: true
@@ -183,6 +183,7 @@ Page {
                     Item { Layout.fillWidth: true }
 
                     Button {
+                        id: addNote
                         text: "Add Note"
 
                         contentItem: Label {
@@ -235,7 +236,8 @@ Page {
                         return
 
                     stackViewRef.push("StudyFlashcardsPage.qml", {
-                        "boardId": root.boardId
+                        "boardId": root.boardId,
+                        stackViewRef: root.stackViewRef
                     })
                 }
             }
@@ -258,12 +260,13 @@ Page {
                 }
 
                 onClicked: {
-                    if (!stackViewRef)
-                        return
+                        if (!root.stackViewRef)
+                            return
 
-                    stackViewRef.push("AskAiPage.qml", {
-                        "boardId": root.boardId
-                    })
+                        root.stackViewRef.push("AskAiPage.qml", {
+                            boardId: root.boardId,
+                            stackViewRef: root.stackViewRef    // <-- pass the stack in
+                        })
                 }
             }
         }

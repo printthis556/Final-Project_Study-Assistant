@@ -7,6 +7,9 @@ Page {
     id: root
 
     property string boardId: ""
+    // NEW: reference to the StackView that owns this page
+    property var stackViewRef
+
     title: "Ask AI"
 
     // palette
@@ -15,6 +18,15 @@ Page {
     property color colorDark: "#3A2C3B"
     property color colorDarkest: "#302531"
     property int radius: 12
+
+    // helper to go back
+    function goBack() {
+        if (stackViewRef) {
+            stackViewRef.pop()
+        } else {
+            console.warn("AskAiPage: stackViewRef not set, cannot go back");
+        }
+    }
 
     background: Rectangle {
         color: colorDarkest
@@ -28,11 +40,7 @@ Page {
 
             ToolButton {
                 text: "\u25C0 Back"
-                onClicked: {
-                    if (StackView.view) {
-                        StackView.view.pop()
-                    }
-                }
+                onClicked: root.goBack()   // <-- call the helper
 
                 contentItem: Label {
                     text: parent.text
@@ -166,6 +174,6 @@ Page {
 
     Component.onCompleted: {
         // optional: clear last answer when entering
-        // studyController.clearLastAnswer() if you add such an API
+        // studyController.clearLastAnswer()
     }
 }

@@ -7,6 +7,7 @@ Page {
     id: root
 
     property string boardId: ""
+    property var stackViewRef
     title: "Study Flashcards"
 
     // palette
@@ -17,6 +18,15 @@ Page {
     property int radius: 12
 
     property int currentIndex: 0
+
+    // helper for back navigation
+    function goBack() {
+        if (stackViewRef) {
+            stackViewRef.pop()
+        } else {
+            console.warn("StudyFlashcardsPage: stackViewRef not set, cannot go back");
+        }
+    }
 
     background: Rectangle {
         color: colorDarkest
@@ -30,11 +40,7 @@ Page {
 
             ToolButton {
                 text: "\u25C0 Back"
-                onClicked: {
-                    if (StackView.view) {
-                        StackView.view.pop()
-                    }
-                }
+                onClicked: root.goBack()
 
                 contentItem: Label {
                     text: parent.text
