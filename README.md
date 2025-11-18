@@ -1,50 +1,165 @@
-# AI Study Assistant — Flashcard Generator (C++ / Qt6)
+# Final-Project_Study-Assistant
 
-> Small example project: backend library that generates flashcards from notes, plus a console test app.
+A Qt 6 + QML Study Assistant application built for a Programming 2 project.
 
-Layout
-- `core/` — reusable backend (no UI): `Flashcard`, `FlashcardGenerator`, and an `AiClient` skeleton.
-- `app/` — simple console app `flashcard_cli` that exercises the generator.
-- `CMakeLists.txt` — top-level CMake configuration (C++17, Qt6 Core/Network).
-- `.devcontainer/` — devcontainer configuration and setup script for Codespaces.
+This guide shows how to install Qt Creator, clone the repo, open the project, and run it from source.
 
-Quick start (Codespaces / devcontainer)
+---
 
-1. Open this repo in Codespaces or a VS Code devcontainer. The devcontainer image is configured in `.devcontainer/devcontainer.json` and runs `.devcontainer/setup.sh` to install required packages (CMake, Ninja, Qt6).
+## Install Qt Creator
 
-2. From the repo root, configure and build (Ninja):
+1. Go to: https://www.qt.io/download-open-source  
+2. Download the **Qt Online Installer**.
+3. During installation, select custom installation and install the following:
 
+   **Qt Version (required):**
+   - Select the dropdown on "Qt 6.7.3", select:
 ```bash
-mkdir -p build
-cmake -S . -B build -G Ninja
-cmake --build build
+MinGW 11.2.0 64-bit.
 ```
 
-3. Run the console test app:
-
+   **Toolchain (Windows):**
+   - Select the dropdown on "Build Tools", select:
 ```bash
-./build/flashcard_cli
+MinGW 11.2.0 64-bit
+CMake 3.30.5
+Ninja 1.12.1
 ```
 
-What it does
-- `FlashcardGenerator::generateFromText()` splits the input notes into blocks (double-newline separated) and creates a `Flashcard` for each block. The question is the first line truncated to ~80 chars and prefixed with "Explain: ". The answer is the full trimmed block.
-- `AiClient` is a network-enabled skeleton that prepares a JSON POST body and parses an array of `{ "question": "...", "answer": "..." }` from a response. It does not call any real service by default — you must configure your endpoint and API key.
+   **IDE:**
+   - Qt Creator 18.0.0
 
-AiClient notes
-- The placeholder URL is `https://your-ai-endpoint.example.com/v1/flashcards` (in `core/AiClient.cpp`).
-- If you set the environment variable `AI_API_KEY`, the client will include an `Authorization: Bearer <key>` header when making requests.
-- `AiClient` emits `flashcardsReady(const QVector<Flashcard>&)` on success and `errorOccurred(const QString&)` on errors.
+5. Finish installation and open **Qt Creator**.
 
-Development tips
-- CMake: project requires Qt6 Core and Network. `CMakeLists.txt` enables `AUTOMOC` so `Q_OBJECT` is handled automatically.
-- If you change headers in `core/`, rerun CMake configure if necessary.
+---
 
-Troubleshooting
-- If `cmake` complains about missing Qt6 packages, ensure the devcontainer setup script ran successfully (see `.devcontainer/setup.sh`) or install `qt6-base-dev` and `qt6-base-dev-tools` on your machine.
-- If Ninja is missing, install `ninja-build` (the devcontainer setup installs it).
+## Clone This Repository
+
+Clone using **Git** or **GitHub Desktop**.
+
+### Option A — Git (command line)
+
+```bash
+git clone https://github.com/forwizzel/Final-Project_Study-Assistant.git
+```
+
+### Option B — GitHub Desktop
+
+1. Open GitHub Desktop
+
+2. Go to File → Clone Repository
+
+3. Paste the URL: https://github.com/forwizzel/Final-Project_Study-Assistant
+
+4. Choose a local folder and clone.
+
+---
+
+## Open the Project in Qt Creator
+
+**In Qt Creator:**
+1. Go to: File → Open File or Project
+2. Navigate to the cloned project and select:
+```bash
+CMakeLists.txt
+```
+Qt Creator will detect this as a CMake + Qt Quick project.
+
+3. When prompted to configure kits, select:
+```bash
+Qt 6.7.3
+```
+
+> Note: If no kits appear:
+> - Open the Qt Maintenance Tool
+> - Make sure a Qt 6.7.3 version and a compiler toolchain (e.g., MinGW 64-bit) are installed
+
+---
+
+## Build and Run
+
+### IMPORTANT!:
+Navigate to "Projects" (left side bar), click to "Run Settings" (top of projects page), and right under run settings you will see:
+```bash
+"Active run configuration:"
+```
+with a drop down including the options:
+- flashcard_cli
+- study_assistant_qml.
+
+ **You must** select **study_assistant_qml**
+
+> Selecting flashcard_cli will cause the program to run unexpectedly
+
+Once you've done that, continue:
+
+
+**In Qt Creator:**
+1. Click the Run button (green play icon, bottom left) in Qt Creator.
+2. On first run, CMake will configure the project automatically.
+
+Qt Creator then builds the project and launches the application.
+
+The QML frontend (UI) is in:
+```bash
+src/qml/
+```
+
+The C++ backend code is in:
+```bash
+src/
+```
+
+---
+
+## Troubleshooting
+
+### Qt Creator says “No kits available”
+This usually means no compiler / Qt version is configured.
+
+Fix:
+
+1. Open the Qt Maintenance Tool
+
+2. Ensure the following are installed:
+- Qt 6.x.x (with Qt Quick modules)
+- MinGW 64-bit (on Windows) or your platform compiler
+- Qt Creator
+
+3. Reopen the project and reconfigure kits.
+
+### Design tab is greyed out
+Only .ui.qml files support the drag-and-drop visual designer.
+
+Regular .qml files are edited in code mode only and I used standard .qml to work better with backend integration, so the designer does not work.
+
+### Missing Qt modules / import errors
+
+If you see errors like “module ‘QtQuick.Controls’ is not installed”, make sure your Qt installation includes:
+- Qt Quick
+- Qt Quick Controls 2
+- Qt QML
+- Qt Declarative
+
+These typically come with the normal Qt 6 desktop installation, but you can re-run the Qt Maintenance Tool to add them if you dont have them for any reason.
+
+---
+
+## Running the project from Terminal (I DO NOT RECCOMMEND)
+
+You can build and run the project manually via CMake with:
+
+```bash
+cd Final-Project_Study-Assistant
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+Then run the generated executable from the build directory.
+
+---
 
 License
-- This repo contains example code and is provided as-is. Add a LICENSE file if you intend to use a specific license.
-
-# Final-Project_Study-Assistant
-this is a group project for programming 2. The goal is to create an ai assistant that will help students study and assist with projects that they may have. This will be using the Qt framwork. will be using an AI API key for this project. 
+This project is for educational use.
