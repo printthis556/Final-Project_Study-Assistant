@@ -25,9 +25,10 @@ void AiClient::requestFlashcards(const QString &notes)
         return;
     }
 
-    QUrl url = apiEndpoint();
+    QUrl url = flashcardsEndpoint();
     if (!url.isValid()) {
-        emit errorOccurred(QStringLiteral("AI endpoint URL is invalid. Please update AI_API_ENDPOINT."));
+        emit errorOccurred(QStringLiteral(
+            "AI flashcard endpoint is invalid. Set AI_FLASHCARDS_ENDPOINT or AI_API_ENDPOINT."));
         return;
     }
     QNetworkRequest req(url);
@@ -54,9 +55,10 @@ void AiClient::requestAnswer(const QString &notes, const QString &question)
         return;
     }
 
-    QUrl url = apiEndpoint();
+    QUrl url = askEndpoint();
     if (!url.isValid()) {
-        emit errorOccurred(QStringLiteral("AI endpoint URL is invalid. Please update AI_API_ENDPOINT."));
+        emit errorOccurred(QStringLiteral(
+            "AI ask endpoint is invalid. Set AI_ASK_ENDPOINT or AI_API_ENDPOINT."));
         return;
     }
 
@@ -119,12 +121,24 @@ QVector<Flashcard> AiClient::parseFlashcardsFromResponse(const QByteArray &data,
         return out;
     }
 
-    if (!doc.isArray()) {
+    QJsonArray arr;
+    if (doc.isArray()) {
+        arr = doc.array();
+    } else if (doc.isObject()) {
+        QJsonObject obj = doc.object();
+        // Accept either "flashcards" or "cards" payloads when the backend wraps the data.
+        if (obj.value(QStringLiteral("flashcards")).isArray()) {
+            arr = obj.value(QStringLiteral("flashcards")).toArray();
+        } else if (obj.value(QStringLiteral("cards")).isArray()) {
+            arr = obj.value(QStringLiteral("cards")).toArray();
+        }
+    }
+
+    if (arr.isEmpty()) {
         errorOut = QStringLiteral("Unexpected JSON structure: expected an array of flashcards.");
         return out;
     }
 
-    QJsonArray arr = doc.array();
     for (const QJsonValue &val : arr) {
         if (!val.isObject()) continue;
         QJsonObject obj = val.toObject();
@@ -191,13 +205,33 @@ QString AiClient::parseAnswerFromResponse(const QByteArray &data, QString &error
     return QString();
 }
 
-QUrl AiClient::apiEndpoint() const
+QUrl AiClient::endpointFromEnv(const char *envName, const QString &fallbackEnv) const
 {
-    QByteArray endpointEnv = qgetenv("AI_API_ENDPOINT");
-    QString endpoint = endpointEnv.isEmpty()
-            ? QStringLiteral("https://your-ai-endpoint.example.com/v1/ai")
-            : QString::fromUtf8(endpointEnv);
-    return QUrl(endpoint);
+    QByteArray envValue = qgetenv(envName);
+    if (!envValue.isEmpty()) {
+        return QUrl(QString::fromUtf8(envValue));
+    }
+
+    if (!fallbackEnv.isEmpty()) {
+        QByteArray fallbackValue = qgetenv(fallbackEnv.toUtf8().constData());
+        if (!fallbackValue.isEmpty()) {
+            return QUrl(QString::fromUtf8(fallbackValue));
+        }
+    }
+
+    return QUrl();
+}
+
+QUrl AiClient::flashcardsEndpoint() const
+{
+    // Prefer a dedicated flashcards endpoint, fall back to a shared AI endpoint.
+    return endpointFromEnv("AI_FLASHCARDS_ENDPOINT", QStringLiteral("AI_API_ENDPOINT"));
+}
+
+QUrl AiClient::askEndpoint() const
+{
+    // Prefer a dedicated ask endpoint, fall back to a shared AI endpoint.
+    return endpointFromEnv("AI_ASK_ENDPOINT", QStringLiteral("AI_API_ENDPOINT"));
 }
 
 void AiClient::onReplyFinished(QNetworkReply *reply)

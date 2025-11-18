@@ -32,7 +32,9 @@ private:
     QByteArray buildAskBody(const QString &notes, const QString &question) const;
     QVector<Flashcard> parseFlashcardsFromResponse(const QByteArray &data, QString &errorOut) const;
     QString parseAnswerFromResponse(const QByteArray &data, QString &errorOut) const;
-    QUrl apiEndpoint() const;
+    QUrl flashcardsEndpoint() const;
+    QUrl askEndpoint() const;
+    QUrl endpointFromEnv(const char *envName, const QString &fallbackEnv) const;
 
     QNetworkAccessManager m_manager;
 };
