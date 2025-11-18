@@ -29,14 +29,19 @@ Page {
     }
 
     background: Rectangle {
-        color: colorDarkest
+        gradient: Gradient {
+            GradientStop { position: 0; color: colorDarkest }
+            GradientStop { position: 1; color: colorDark }
+        }
     }
 
     header: ToolBar {
-        background: Rectangle { color: colorDark }
+        background: Rectangle { color: colorDark; opacity: 0.95 }
 
         RowLayout {
             anchors.fill: parent
+            anchors.margins: 6
+            spacing: 8
 
             ToolButton {
                 text: "\u25C0 Back"
@@ -47,12 +52,13 @@ Page {
                     color: colorLight
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+                    font.bold: true
                 }
             }
 
             Label {
                 text: "Ask AI"
-                font.pixelSize: 20
+                font.pixelSize: 22
                 font.bold: true
                 color: colorLight
                 Layout.alignment: Qt.AlignVCenter
@@ -67,31 +73,31 @@ Page {
         anchors.margins: 16
         spacing: 12
 
-        GroupBox {
-            title: "Your question"
+        Frame {
             Layout.fillWidth: true
-
-            label: Label {
-                text: control.title
-                color: colorMedium
-                font.bold: true
-            }
+            padding: 12
 
             background: Rectangle {
                 radius: radius
                 color: colorDark
-                border.color: "#241A26"
+                border.color: colorMedium
+                opacity: 0.95
             }
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 8
-                spacing: 4
+                spacing: 8
+
+                Label {
+                    text: "Your question"
+                    color: colorMedium
+                    font.bold: true
+                }
 
                 TextArea {
                     id: questionInput
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 120
+                    Layout.preferredHeight: 140
                     placeholderText: "Ask a question based on the notes in this board..."
                     wrapMode: TextArea.Wrap
                     color: colorLight
@@ -101,6 +107,7 @@ Page {
                         radius: radius
                         color: colorDarkest
                         border.color: colorMedium
+                        opacity: 0.9
                     }
                 }
 
@@ -122,11 +129,14 @@ Page {
                             color: colorDarkest
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
+                            font.bold: true
                         }
 
                         background: Rectangle {
                             radius: radius
                             color: colorMedium
+                            border.color: colorLight
+                            border.width: 1
                         }
 
                         onClicked: {
@@ -137,36 +147,42 @@ Page {
             }
         }
 
-        GroupBox {
-            title: "AI answer"
+        Frame {
             Layout.fillWidth: true
             Layout.fillHeight: true
-
-            label: Label {
-                text: control.title
-                color: colorMedium
-                font.bold: true
-            }
+            padding: 12
 
             background: Rectangle {
                 radius: radius
                 color: colorDark
-                border.color: "#241A26"
+                border.color: colorMedium
+                opacity: 0.95
             }
 
-            ScrollView {
+            ColumnLayout {
                 anchors.fill: parent
-                clip: true
+                spacing: 8
 
-                Text {
-                    id: answerText
-                    anchors.margins: 8
-                    width: parent.width - 16
-                    text: studyController.lastAiAnswer.length > 0
-                          ? studyController.lastAiAnswer
-                          : "No answer yet. Ask a question above."
-                    wrapMode: Text.WordWrap
-                    color: colorLight
+                Label {
+                    text: "AI answer"
+                    color: colorMedium
+                    font.bold: true
+                }
+
+                ScrollView {
+                    anchors.fill: parent
+                    clip: true
+
+                    Text {
+                        id: answerText
+                        anchors.margins: 8
+                        width: parent.width - 16
+                        text: studyController.lastAiAnswer.length > 0
+                              ? studyController.lastAiAnswer
+                              : "No answer yet. Ask a question above."
+                        wrapMode: Text.WordWrap
+                        color: colorLight
+                    }
                 }
             }
         }

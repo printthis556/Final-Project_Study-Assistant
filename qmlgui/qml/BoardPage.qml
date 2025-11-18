@@ -25,17 +25,22 @@ Page {
     }
 
     background: Rectangle {
-        color: colorDarkest
+        gradient: Gradient {
+            GradientStop { position: 0; color: colorDarkest }
+            GradientStop { position: 1; color: colorDark }
+        }
     }
 
     header: ToolBar {
         background: Rectangle {
             color: colorDark
+            opacity: 0.95
         }
 
         RowLayout {
             anchors.fill: parent
-            spacing: 8
+            spacing: 10
+            anchors.margins: 6
 
             ToolButton {
                 text: "\u25C0 Back"
@@ -46,15 +51,26 @@ Page {
                     color: colorLight
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+                    font.bold: true
                 }
             }
 
-            Label {
-                text: boardManager.currentBoardName
-                font.pixelSize: 22
-                font.bold: true
-                color: colorLight
-                Layout.alignment: Qt.AlignVCenter
+            ColumnLayout {
+                spacing: 2
+
+                Label {
+                    text: boardManager.currentBoardName
+                    font.pixelSize: 24
+                    font.bold: true
+                    color: colorLight
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                Label {
+                    text: boardManager.currentBoardNotes.length + " notes available"
+                    color: colorMedium
+                    font.pixelSize: 12
+                }
             }
 
             Item { Layout.fillWidth: true }
@@ -64,145 +80,166 @@ Page {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 12
+        spacing: 14
 
-        // NOTES LIST
-        GroupBox {
-            title: "Notes in this board"
+        // NOTES LIST + ADD NOTE side by side
+        RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: 14
 
-            label: Label {
-                text: control.title
-                color: colorMedium
-                font.pixelSize: 14
-                font.bold: true
-            }
+            GroupBox {
+                title: "Notes in this board"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-            background: Rectangle {
-                radius: radius
-                color: colorDark
-                border.color: "#241A26"
-            }
+                label: Label {
+                    text: control.title
+                    color: colorMedium
+                    font.pixelSize: 14
+                    font.bold: true
+                }
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 8
-                spacing: 8
+                background: Rectangle {
+                    radius: radius
+                    color: colorDark
+                    border.color: "#241A26"
+                    opacity: 0.95
+                }
 
-                ListView {
-                    id: notesList
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-                    spacing: 8
-                    model: boardManager.currentBoardNotes
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 8
+                    spacing: 10
 
-                    delegate: Frame {
-                        width: ListView.view.width
-                        padding: 10
+                    ListView {
+                        id: notesList
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        clip: true
+                        spacing: 8
+                        model: boardManager.currentBoardNotes
 
-                        background: Rectangle {
-                            radius: radius
-                            color: colorDarkest
-                            border.color: "#241A26"
-                        }
+                        delegate: Frame {
+                            width: ListView.view.width
+                            padding: 12
 
-                        Column {
-                            spacing: 4
-
-                            Text {
-                                text: modelData.preview
-                                wrapMode: Text.WordWrap
-                                color: colorLight
+                            background: Rectangle {
+                                radius: radius
+                                color: colorDarkest
+                                border.color: "#241A26"
+                                opacity: 0.9
                             }
-                            Text {
-                                text: "Full length: " + modelData.text.length + " chars"
-                                color: "#B9A8B7"
-                                font.pixelSize: 10
-                            }
-                        }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.RightButton
-                            onClicked: {
-                                if (mouse.button === Qt.RightButton) {
-                                    boardManager.deleteNoteFromCurrentBoard(modelData.index)
+                            Column {
+                                spacing: 6
+
+                                Text {
+                                    text: modelData.preview
+                                    wrapMode: Text.WordWrap
+                                    color: colorLight
+                                    font.pixelSize: 14
+                                }
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: colorMedium
+                                    opacity: 0.2
+                                }
+                                Text {
+                                    text: "Full length: " + modelData.text.length + " chars"
+                                    color: "#B9A8B7"
+                                    font.pixelSize: 10
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.RightButton
+                                onClicked: {
+                                    if (mouse.button === Qt.RightButton) {
+                                        boardManager.deleteNoteFromCurrentBoard(modelData.index)
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    ScrollBar.vertical: ScrollBar { }
-                }
-            }
-        }
-
-        // ADD NOTE
-        GroupBox {
-            title: "Add note"
-            Layout.fillWidth: true
-
-            label: Label {
-                text: addNote.title
-                color: colorMedium
-                font.pixelSize: 14
-                font.bold: true
-            }
-
-            background: Rectangle {
-                radius: radius
-                color: colorDark
-                border.color: "#241A26"
-            }
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 8
-                spacing: 4
-
-                TextArea {
-                    id: noteInput
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 120
-                    wrapMode: TextArea.Wrap
-                    placeholderText: "Paste or type notes here..."
-                    color: colorLight
-                    placeholderTextColor: colorMedium
-
-                    background: Rectangle {
-                        radius: radius
-                        color: colorDarkest
-                        border.color: colorMedium
+                        ScrollBar.vertical: ScrollBar { }
                     }
                 }
+            }
 
-                RowLayout {
-                    Layout.fillWidth: true
-                    Item { Layout.fillWidth: true }
+            GroupBox {
+                title: "Add note"
+                Layout.preferredWidth: 320
+                Layout.fillHeight: true
 
-                    Button {
-                        id: addNote
-                        text: "Add Note"
+                label: Label {
+                    text: addNote.title
+                    color: colorMedium
+                    font.pixelSize: 14
+                    font.bold: true
+                }
 
-                        contentItem: Label {
-                            text: parent.text
-                            color: colorDarkest
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                background: Rectangle {
+                    radius: radius
+                    color: colorDark
+                    border.color: "#241A26"
+                    opacity: 0.95
+                }
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 8
+
+                    TextArea {
+                        id: noteInput
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        wrapMode: TextArea.Wrap
+                        placeholderText: "Paste or type notes here..."
+                        color: colorLight
+                        placeholderTextColor: colorMedium
 
                         background: Rectangle {
                             radius: radius
-                            color: colorMedium
+                            color: colorDarkest
+                            border.color: colorMedium
+                            opacity: 0.9
                         }
+                    }
 
-                        onClicked: {
-                            if (noteInput.text.trim().length === 0)
-                                return
-                            boardManager.addNoteToCurrentBoard(noteInput.text)
-                            noteInput.text = ""
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Item { Layout.fillWidth: true }
+
+                        Button {
+                            id: addNote
+                            text: "Add Note"
+                            padding: 10
+
+                            contentItem: Label {
+                                text: parent.text
+                                color: colorDarkest
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.bold: true
+                            }
+
+                            background: Rectangle {
+                                radius: radius
+                                color: colorMedium
+                                border.color: colorLight
+                                border.width: 1
+                            }
+
+                            onClicked: {
+                                if (noteInput.text.trim().length === 0)
+                                    return
+                                boardManager.addNoteToCurrentBoard(noteInput.text)
+                                noteInput.text = ""
+                            }
                         }
                     }
                 }
@@ -210,63 +247,81 @@ Page {
         }
 
         // ACTION BUTTONS
-        RowLayout {
+        Frame {
             Layout.fillWidth: true
-            spacing: 12
+            padding: 12
 
-            Button {
-                text: "Study Flashcards"
-                Layout.fillWidth: true
-                enabled: boardManager.currentBoardNotes.length > 0
-
-                contentItem: Label {
-                    text: parent.text
-                    color: colorDarkest
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                background: Rectangle {
-                    radius: radius
-                    color: colorMedium
-                }
-
-                onClicked: {
-                    if (!stackViewRef)
-                        return
-
-                    stackViewRef.push("StudyFlashcardsPage.qml", {
-                        "boardId": root.boardId,
-                        stackViewRef: root.stackViewRef
-                    })
-                }
+            background: Rectangle {
+                radius: radius
+                color: colorDark
+                border.color: colorMedium
+                opacity: 0.9
             }
 
-            Button {
-                text: "Ask AI"
-                Layout.fillWidth: true
-                enabled: boardManager.currentBoardNotes.length > 0
+            RowLayout {
+                anchors.fill: parent
+                spacing: 12
 
-                contentItem: Label {
-                    text: parent.text
-                    color: colorDarkest
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
+                Button {
+                    text: "Study Flashcards"
+                    Layout.fillWidth: true
+                    enabled: boardManager.currentBoardNotes.length > 0
 
-                background: Rectangle {
-                    radius: radius
-                    color: colorMedium
-                }
+                    contentItem: Label {
+                        text: parent.text
+                        color: colorDarkest
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                    }
 
-                onClicked: {
-                        if (!root.stackViewRef)
+                    background: Rectangle {
+                        radius: radius
+                        color: colorMedium
+                        border.color: colorLight
+                        border.width: 1
+                    }
+
+                    onClicked: {
+                        if (!stackViewRef)
                             return
 
-                        root.stackViewRef.push("AskAiPage.qml", {
-                            boardId: root.boardId,
-                            stackViewRef: root.stackViewRef    // <-- pass the stack in
+                        stackViewRef.push("StudyFlashcardsPage.qml", {
+                            "boardId": root.boardId,
+                            stackViewRef: root.stackViewRef
                         })
+                    }
+                }
+
+                Button {
+                    text: "Ask AI"
+                    Layout.fillWidth: true
+                    enabled: boardManager.currentBoardNotes.length > 0
+
+                    contentItem: Label {
+                        text: parent.text
+                        color: colorDarkest
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                    }
+
+                    background: Rectangle {
+                        radius: radius
+                        color: colorMedium
+                        border.color: colorLight
+                        border.width: 1
+                    }
+
+                    onClicked: {
+                            if (!root.stackViewRef)
+                                return
+
+                            root.stackViewRef.push("AskAiPage.qml", {
+                                boardId: root.boardId,
+                                stackViewRef: root.stackViewRef    // <-- pass the stack in
+                            })
+                    }
                 }
             }
         }
