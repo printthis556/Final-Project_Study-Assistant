@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Enable Qt's automoc for QObject (AiClient)
 set(CMAKE_AUTOMOC ON)
 
-# We now need Widgets too
-find_package(Qt6 REQUIRED COMPONENTS Core Network Widgets)
+# Core components for the shared backend and CLI
+find_package(Qt6 REQUIRED COMPONENTS Core Network)
 
 # ---- core library ----
 add_library(core
@@ -40,19 +40,6 @@ target_link_libraries(flashcard_cli
     PRIVATE
         core
         Qt6::Core
-)
-
-# ---- Qt Widgets GUI app ----
-add_executable(study_assistant_gui
-    qtgui/main.cpp
-    qtgui/MainWindow.h
-    qtgui/MainWindow.cpp
-)
-
-target_link_libraries(study_assistant_gui
-    PRIVATE
-        core
-        Qt6::Widgets
 )
 
 add_subdirectory(qmlgui)
