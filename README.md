@@ -10,18 +10,26 @@ This guide shows how to install Qt Creator, clone the repo, open the project, an
 
 1. Go to: https://www.qt.io/download-open-source  
 2. Download the **Qt Online Installer**.
-3. During installation, select:
+3. During installation, select custom installation and install the following:
 
    **Qt Version (required):**
-   - Qt 6.x.x (**6.7 or newer recommended**)
+   - Select the dropdown on "Qt 6.7.3", select:
+```bash
+MinGW 11.2.0 64-bit.
+```
 
    **Toolchain (Windows):**
-   - MinGW 64-bit
+   - Select the dropdown on "Build Tools", select:
+```bash
+MinGW 11.2.0 64-bit
+CMake 3.30.5
+Ninja 1.12.1
+```
 
    **IDE:**
-   - Qt Creator
+   - Qt Creator 18.0.0
 
-4. Finish installation and open **Qt Creator**.
+5. Finish installation and open **Qt Creator**.
 
 ---
 
