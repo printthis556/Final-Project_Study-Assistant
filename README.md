@@ -1,6 +1,6 @@
 # Final-Project_Study-Assistant
 
-A Qt 6 + QML Study Assistant application built for a Software Engineering project.
+A Qt 6 + QML Study Assistant application built for a Programming 2 project.
 
 This guide shows how to install Qt Creator, clone the repo, open the project, and run it from source.
 
