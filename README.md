@@ -161,5 +161,28 @@ Then run the generated executable from the build directory.
 
 ---
 
+## Using a Cloudflare Worker for AI
+
+- **Built-in default:** The application will use the Cloudflare Worker at
+   `https://ai-study-app.mhess0308.workers.dev/` automatically if no AI endpoint
+   environment variables are set. This worker implements a simple deterministic
+   flashcard generator and accepts POST JSON with a `notes` field.
+- **Optional env var:** To override or use a different endpoint, set
+   `AI_FLASHCARDS_ENDPOINT`, `AI_ASK_ENDPOINT`, or `AI_API_ENDPOINT` to the
+   desired URL before launching the app. Example (bash):
+
+```bash
+export AI_API_ENDPOINT="https://ai-study-app.mhess0308.workers.dev/"
+```
+
+- **API key:** If you have an API key for another AI provider, set
+   `AI_API_KEY`. The app will include an `Authorization: Bearer <key>` header
+   when the var is present. The Cloudflare Worker does not require an API key.
+
+To test quickly, open the app and use the AI features — the app will POST
+JSON like `{"notes": "..."}` to the endpoint and expects a JSON array of
+objects with `question` and `answer` fields in response.
+
+
 License
 This project is for educational use.

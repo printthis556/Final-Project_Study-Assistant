@@ -225,13 +225,21 @@ QUrl AiClient::endpointFromEnv(const char *envName, const QString &fallbackEnv) 
 QUrl AiClient::flashcardsEndpoint() const
 {
     // Prefer a dedicated flashcards endpoint, fall back to a shared AI endpoint.
-    return endpointFromEnv("AI_FLASHCARDS_ENDPOINT", QStringLiteral("AI_API_ENDPOINT"));
+    QUrl url = endpointFromEnv("AI_FLASHCARDS_ENDPOINT", QStringLiteral("AI_API_ENDPOINT"));
+    if (url.isValid()) return url;
+
+    // Default to a Cloudflare Worker that generates flashcards (if no env var set).
+    return QUrl(QStringLiteral("https://ai-study-app.mhess0308.workers.dev/"));
 }
 
 QUrl AiClient::askEndpoint() const
 {
     // Prefer a dedicated ask endpoint, fall back to a shared AI endpoint.
-    return endpointFromEnv("AI_ASK_ENDPOINT", QStringLiteral("AI_API_ENDPOINT"));
+    QUrl url = endpointFromEnv("AI_ASK_ENDPOINT", QStringLiteral("AI_API_ENDPOINT"));
+    if (url.isValid()) return url;
+
+    // Default to the same Cloudflare Worker as a sensible fallback for ask requests.
+    return QUrl(QStringLiteral("https://ai-study-app.mhess0308.workers.dev/"));
 }
 
 void AiClient::onReplyFinished(QNetworkReply *reply)
