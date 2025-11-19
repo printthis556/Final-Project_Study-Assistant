@@ -331,6 +331,8 @@ void AiClient::onReplyFinished(QNetworkReply *reply)
 
     QByteArray data = reply->readAll();
     reply->deleteLater();
+    // Emit raw response (UTF-8) for debugging UI to display if needed.
+    emit rawResponse(QString::fromUtf8(data));
     QString requestType = reply->property("ai_request_type").toByteArray();
 
     QString parseError;

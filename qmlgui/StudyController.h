@@ -15,6 +15,8 @@ class StudyController : public QObject
     Q_PROPERTY(QString lastAiAnswer READ lastAiAnswer NOTIFY lastAiAnswerChanged)
     Q_PROPERTY(bool isBusy READ isBusy NOTIFY isBusyChanged)
     Q_PROPERTY(bool useLocalFlashcards READ isUseLocalFlashcards NOTIFY useLocalFlashcardsChanged)
+    Q_PROPERTY(QString lastAiRawResponse READ lastAiRawResponse NOTIFY lastAiRawResponseChanged)
+    Q_PROPERTY(QString lastAiError READ lastAiError NOTIFY lastAiErrorChanged)
 
 public:
     explicit StudyController(BoardManager *manager, AiClient *aiClient, QObject *parent = nullptr);
@@ -29,6 +31,8 @@ public:
     Q_INVOKABLE void setAiApiKey(const QString &key);
     Q_INVOKABLE void setUseLocalFlashcards(bool useLocal);
     bool isUseLocalFlashcards() const { return m_useLocalFlashcards; }
+    QString lastAiRawResponse() const { return m_lastAiRawResponse; }
+    QString lastAiError() const { return m_lastAiError; }
 
 signals:
     void flashcardsChanged();
@@ -36,6 +40,8 @@ signals:
     void isBusyChanged();
     void errorOccurred(const QString &msg);
     void useLocalFlashcardsChanged();
+    void lastAiRawResponseChanged();
+    void lastAiErrorChanged();
 
 private:
     void setBusy(bool busy);
@@ -51,4 +57,7 @@ private:
     QString m_lastAiAnswer;
     bool m_isBusy = false;
     bool m_useLocalFlashcards = false;
+    QString m_lastAiRawResponse;
+    QString m_lastAiError;
+    QString m_lastNotes;
 };

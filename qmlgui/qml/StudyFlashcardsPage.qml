@@ -129,6 +129,25 @@ Page {
                 }
 
                 Button {
+                    id: aiDebugButton
+                    text: "AI Debug"
+                    contentItem: Label {
+                        text: parent.text
+                        color: colorDarkest
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                    }
+                    background: Rectangle {
+                        radius: radius
+                        color: colorMedium
+                        border.color: colorLight
+                        border.width: 1
+                    }
+                    onClicked: aiDebugDialog.open()
+                }
+
+                Button {
                     text: "Regenerate"
                     enabled: !studyController.isBusy
 
@@ -307,5 +326,50 @@ Page {
     Component.onCompleted: {
         studyController.generateFlashcardsForBoard(boardId)
         currentIndex = 0
+    }
+
+    Dialog {
+        id: aiDebugDialog
+        title: "AI Debug"
+        modal: false
+        standardButtons: Dialog.Close
+
+        background: Rectangle {
+            radius: radius
+            color: colorDark
+            border.color: colorMedium
+            border.width: 1
+        }
+
+        contentItem: Column {
+            spacing: 8
+            width: 700
+
+            Label {
+                text: "Last raw AI response"
+                color: colorMedium
+            }
+            TextArea {
+                readOnly: true
+                wrapMode: TextEdit.Wrap
+                text: studyController.lastAiRawResponse
+                font.pixelSize: 12
+                width: parent.width
+                height: 160
+            }
+
+            Label {
+                text: "Last AI error"
+                color: colorMedium
+            }
+            TextArea {
+                readOnly: true
+                wrapMode: TextEdit.Wrap
+                text: studyController.lastAiError
+                font.pixelSize: 12
+                width: parent.width
+                height: 120
+            }
+        }
     }
 }

@@ -27,6 +27,8 @@ signals:
     void flashcardsReady(const QVector<Flashcard> &cards);
     void answerReady(const QString &answer);
     void errorOccurred(const QString &message);
+    // Emitted with the raw response body (UTF-8) for debugging purposes.
+    void rawResponse(const QString &raw);
 
 private slots:
     void onReplyFinished(QNetworkReply *reply);

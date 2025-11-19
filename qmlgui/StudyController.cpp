@@ -10,6 +10,10 @@ StudyController::StudyController(BoardManager *manager, AiClient *aiClient, QObj
         connect(m_aiClient, &AiClient::flashcardsReady, this, &StudyController::handleFlashcardsReady);
         connect(m_aiClient, &AiClient::answerReady, this, &StudyController::handleAnswerReady);
         connect(m_aiClient, &AiClient::errorOccurred, this, &StudyController::handleAiError);
+        connect(m_aiClient, &AiClient::rawResponse, this, [this](const QString &raw) {
+            m_lastAiRawResponse = raw;
+            emit lastAiRawResponseChanged();
+        });
     }
 }
 
@@ -127,6 +131,8 @@ void StudyController::handleAnswerReady(const QString &answer)
 void StudyController::handleAiError(const QString &message)
 {
     qDebug() << "handleAiError:" << message;
+    m_lastAiError = message;
+    emit lastAiErrorChanged();
 
     // If AI errors and local generation is allowed, fall back to local generator
     if (!m_useLocalFlashcards) {
