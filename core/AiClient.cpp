@@ -25,11 +25,19 @@ void AiClient::requestFlashcards(const QString &notes)
         return;
     }
 
-    QUrl url(QStringLiteral("https://your-ai-endpoint.example.com/v1/flashcards"));
+    // Prefer Cloudflare Worker URL from environment variable `CF_WORKER_URL`.
+    // Fall back to localhost at port 8787 for `wrangler dev` testing.
+    QByteArray envUrl = qgetenv("CF_WORKER_URL");
+    // Default to the user's deployed worker if CF_WORKER_URL is not set.
+    QUrl url = !envUrl.isEmpty()
+                   ? QUrl::fromUserInput(QString::fromUtf8(envUrl))
+                   : QUrl(QStringLiteral("https://ai-study-app.mhess0308.workers.dev/"));
+    // If CF_WORKER_URL contains no scheme (e.g. myworker.workers.dev), QUrl::fromUserInput will handle it.
+
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
 
-    // If AI_API_KEY env var exists, add Authorization header
+    // Keep support for AI_API_KEY if user points AiClient at a protected endpoint.
     QByteArray apiKey = qgetenv("AI_API_KEY");
     if (!apiKey.isEmpty()) {
         QByteArray bearer = "Bearer " + apiKey;
@@ -42,16 +50,9 @@ void AiClient::requestFlashcards(const QString &notes)
 
 QByteArray AiClient::buildRequestBody(const QString &notes) const
 {
+    // Worker expects { "notes": "..." }
     QJsonObject root;
-    QString prompt = QStringLiteral(
-        "You are an assistant that converts lecture notes into study flashcards. "
-        "Return a JSON array of objects with fields \"question\" and \"answer\". "
-        "Base flashcards on the text provided in the \"notes\" field. "
-        "Ensure answers are concise but informative.\n\n"
-    );
-    root.insert(QStringLiteral("prompt"), prompt + QStringLiteral("\nNotes:\n") + notes);
-    root.insert(QStringLiteral("max_flashcards"), 30);
-
+    root.insert(QStringLiteral("notes"), notes);
     QJsonDocument doc(root);
     return doc.toJson(QJsonDocument::Compact);
 }

@@ -1,7 +1,7 @@
 #include <QApplication>
 #include "MainWindow.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[])// this is argument counting the number of command line arguments
 {
     QApplication app(argc, argv);
 

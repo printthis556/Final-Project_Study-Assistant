@@ -35,6 +35,41 @@ AiClient notes
 - If you set the environment variable `AI_API_KEY`, the client will include an `Authorization: Bearer <key>` header when making requests.
 - `AiClient` emits `flashcardsReady(const QVector<Flashcard>&)` on success and `errorOccurred(const QString&)` on errors.
 
+Cloudflare Worker (optional, simple setup)
+- **What**: a small Cloudflare Worker can host a simple flashcard generator endpoint. The repository includes a demo worker in `worker/worker.js` that accepts a POST JSON body `{ "notes": "..." }` and returns a JSON array of `{ "question": "..", "answer": ".." }`.
+- **Why**: this lets you run the AI portion as a tiny serverless function you control (no external API keys required for the demo worker).
+- **Files added**: `worker/worker.js`, `worker/wrangler.toml`.
+- **Deploy quickly with Wrangler**:
+
+```bash
+# install wrangler (if needed)
+npm install -g wrangler
+
+# login and publish (interactive)
+wrangler login
+wrangler publish --project-worker-path worker/worker.js
+```
+
+- **Local testing**:
+
+```bash
+# run a local dev server from the repo root; this listens on port 8787 by default
+wrangler dev worker/worker.js --port 8787
+
+# then in another shell point the app at the worker
+export CF_WORKER_URL="http://127.0.0.1:8787/"
+./build/study_assistant_gui
+```
+
+If you've published the demo worker, the repository now defaults to the public URL below when `CF_WORKER_URL` is not set. You can explicitly set it as well:
+
+```bash
+export CF_WORKER_URL="https://ai-study-app.mhess0308.workers.dev/"
+./build/study_assistant_gui
+```
+
+- **Usage from the app**: set the environment variable `CF_WORKER_URL` to your worker's public URL (for example `https://<your-subdomain>.workers.dev/`) before launching the GUI/CLI. `AiClient` will post `{ "notes": ... }` to that URL and expects an array of flashcards back.
+
 Development tips
 - CMake: project requires Qt6 Core and Network. `CMakeLists.txt` enables `AUTOMOC` so `Q_OBJECT` is handled automatically.
 - If you change headers in `core/`, rerun CMake configure if necessary.
